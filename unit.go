@@ -15,14 +15,14 @@ const (
 
 var (
 	anon  = "anon"
-	panon Punit
+	panon unit
 )
 
 func init() {
-	SetAnno(anon)
+	setAnno(anon)
 }
 
-func NewSet(s []string) mapset.Set {
+func newSet(s []string) mapset.Set {
 	a := mapset.NewSet()
 	for _, v := range s {
 		a.Add(v)
@@ -31,17 +31,17 @@ func NewSet(s []string) mapset.Set {
 }
 
 //+gen * methods:"All,Any"
-type Punit struct {
+type unit struct {
 	Parts []mapset.Set
 }
 
-func NewPunit(pstr string) *Punit {
-	p := &Punit{}
-	p.setParts(pstr)
-	return p
+func newUnit(pstr string) *unit {
+	u := &unit{}
+	u.setParts(pstr)
+	return u
 }
 
-func SetAnno(pstr string) {
+func setAnno(pstr string) {
 	err := panon.setPartsWidthErr(pstr)
 	if err != nil {
 		glog.Errorf(err.Error())
@@ -51,43 +51,46 @@ func SetAnno(pstr string) {
 	anon = pstr
 }
 
-func (p *Punit) setParts(expr string) {
-	err := p.setPartsWidthErr(expr)
+func (u *unit) setParts(expr string) {
+	err := u.setPartsWidthErr(expr)
 	if err != nil {
 		glog.Infoln(err.Error())
-		p.setPartsWidthErr(anon)
+		u.setPartsWidthErr(anon)
 	}
 }
 
-func (p *Punit) setPartsWidthErr(expr string) error {
+func (u *unit) setPartsWidthErr(expr string) error {
 	s := strings.Trim(expr, " "+TokenDelim)
 	if len(s) == 0 {
 		return errors.New("权限单元格式错误,不能只包含token分界符(:)")
 	}
 	s = strings.ToLower(s)
 	parts := strings.Split(s, TokenDelim)
-	p.Parts = make([]mapset.Set, len(parts))
+	u.Parts = make([]mapset.Set, len(parts))
 	for i, v := range parts {
 		v = strings.Trim(v, " "+SubTokenDelim)
 		if len(v) == 0 {
 			return errors.New("权限单元格式错误,不能只包含sub token分界符(,)")
 		}
 		subparts := strings.Split(v, SubTokenDelim)
-		p.Parts[i] = NewSet(subparts)
+		u.Parts[i] = newSet(subparts)
 	}
 	return nil
 }
 
-func (p *Punit) Implies(req *Punit) bool {
-	available := p.Parts
-	requested := req.Parts
+func (u *unit) implies(req *unit) bool {
+	if req == nil {
+		return true
+	}
+	available := u.Parts
+	required := req.Parts
 	i := 0
-	for _, v := range requested {
+	for _, v := range required {
 		if len(available)-1 < i {
 			return true
 		} else {
 			part := available[i]
-			if !part.Contains(WildCard) && !part.IsSubset(v) {
+			if !part.Contains(WildCard) && !part.IsSuperset(v) {
 				return false
 			}
 			i++
@@ -102,6 +105,6 @@ func (p *Punit) Implies(req *Punit) bool {
 	return true
 }
 
-func (p *Punit) ImpliesAnon(req *Punit) bool {
-	return panon.Implies(req) || p.Implies(req)
+func (u *unit) impliesAnon(req *unit) bool {
+	return panon.implies(req) || u.implies(req)
 }

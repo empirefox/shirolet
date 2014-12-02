@@ -1,0 +1,18 @@
+{
+	"ImportPath": "github.com/empirefox/shirolet",
+	"GoVersion": "go1.3.3",
+	"Deps": [
+		{
+			"ImportPath": "github.com/golang/glog",
+			"Rev": ""
+		},
+		{
+			"ImportPath": "github.com/jtolds/gls",
+			"Rev": ""
+		},
+		{
+			"ImportPath": "github.com/smartystreets/goconvey/convey",
+			"Rev": ""
+		}
+	]
+}

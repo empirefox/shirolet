@@ -2,9 +2,9 @@ package shirolet
 
 import (
 	"errors"
-	"github.com/deckarep/golang-set"
-	"github.com/golang/glog"
 	"strings"
+
+	"github.com/golang/glog"
 )
 
 const (
@@ -22,17 +22,9 @@ func init() {
 	setAnno(anon)
 }
 
-func newSet(s []string) mapset.Set {
-	a := mapset.NewSet()
-	for _, v := range s {
-		a.Add(v)
-	}
-	return a
-}
-
 //+gen * methods:"All,Any"
 type unit struct {
-	Parts []mapset.Set
+	Parts []WordSet
 }
 
 func newUnit(pstr string) *unit {
@@ -54,7 +46,6 @@ func setAnno(pstr string) {
 func (u *unit) setParts(expr string) {
 	err := u.setPartsWidthErr(expr)
 	if err != nil {
-		glog.Infoln(err.Error())
 		u.setPartsWidthErr(anon)
 	}
 }
@@ -62,18 +53,18 @@ func (u *unit) setParts(expr string) {
 func (u *unit) setPartsWidthErr(expr string) error {
 	s := strings.Trim(expr, " "+TokenDelim)
 	if len(s) == 0 {
-		return errors.New("权限单元格式错误,不能只包含token分界符(:)")
+		return errors.New("权限单元格式错误,不能只包含token分界符(:)," + s)
 	}
 	s = strings.ToLower(s)
 	parts := strings.Split(s, TokenDelim)
-	u.Parts = make([]mapset.Set, len(parts))
+	u.Parts = make([]WordSet, len(parts))
 	for i, v := range parts {
 		v = strings.Trim(v, " "+SubTokenDelim)
 		if len(v) == 0 {
-			return errors.New("权限单元格式错误,不能只包含sub token分界符(,)")
+			return errors.New("权限单元格式错误,不能只包含sub token分界符(,)," + v)
 		}
 		subparts := strings.Split(v, SubTokenDelim)
-		u.Parts[i] = newSet(subparts)
+		u.Parts[i] = NewWordSet(subparts...)
 	}
 	return nil
 }

@@ -2,9 +2,9 @@ package shirolet
 
 import (
 	"fmt"
-	"github.com/deckarep/golang-set"
-	. "github.com/smartystreets/goconvey/convey"
 	"testing"
+
+	. "github.com/smartystreets/goconvey/convey"
 )
 
 type pair struct {
@@ -211,25 +211,25 @@ func TestImplies(t *testing.T) {
 func TestSetPartsWidthErr(t *testing.T) {
 	ps := map[string]*unit{
 		"a": &unit{
-			[]mapset.Set{newSet([]string{"a"})},
+			[]WordSet{NewWordSet("a")},
 		},
 		"a,b": &unit{
-			[]mapset.Set{newSet([]string{"a", "b"})},
+			[]WordSet{NewWordSet("a", "b")},
 		},
 		"a,b:c": &unit{
-			[]mapset.Set{newSet([]string{"a", "b"}), newSet([]string{"c"})},
+			[]WordSet{NewWordSet("a", "b"), NewWordSet("c")},
 		},
 		"a,b:c,d": &unit{
-			[]mapset.Set{newSet([]string{"a", "b"}), newSet([]string{"c", "d"})},
+			[]WordSet{NewWordSet("a", "b"), NewWordSet("c", "d")},
 		},
 		"a,b:c,d:e": &unit{
-			[]mapset.Set{newSet([]string{"a", "b"}), newSet([]string{"c", "d"}), newSet([]string{"e"})},
+			[]WordSet{NewWordSet("a", "b"), NewWordSet("c", "d"), NewWordSet("e")},
 		},
 		"a,b:c,d:e,f": &unit{
-			[]mapset.Set{newSet([]string{"a", "b"}), newSet([]string{"c", "d"}), newSet([]string{"e", "f"})},
+			[]WordSet{NewWordSet("a", "b"), NewWordSet("c", "d"), NewWordSet("e", "f")},
 		},
 		"a,b:*:e,f": &unit{
-			[]mapset.Set{newSet([]string{"a", "b"}), newSet([]string{"*"}), newSet([]string{"e", "f"})},
+			[]WordSet{NewWordSet("a", "b"), NewWordSet("*"), NewWordSet("e", "f")},
 		},
 	}
 	Convey("生成Parts逻辑", t, func() {
